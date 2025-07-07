@@ -1,0 +1,44 @@
+<!-- Basic examples -->
+Env test: {{ env.Getenv "LANG" "en_US" }} {{ env.Getenv "SECRET" | toJSON }}
+Bool test: {{ conv.Bool "yes" }}
+Number test: {{ conv.Int "23" }} {{ conv.ToInts "42" "128" }}
+Float tests: {{ conv.Float "1.55" }} {{ conv.ToFloat64s "," "1,55" "44.2" }} {{ "1,66" | conv.Float "," }}
+
+<!-- JSON Examples -->
+JSON object test: {{ json `{"name": "John", "age": 30}` }}
+JSON array test: {{ jsonArray "[{\"id\": 1}, {\"id\": 2}]" }}
+Pretty JSON: {{ toJSONPretty "  " .user1 }}
+
+<!-- YAML Examples -->
+YAML object test: {{ yaml `---
+name: John
+age: 30
+...
+` }}
+YAML array test: {{ yamlArray `---
+- id: 1
+- id: 2
+...
+` }}
+
+<!-- TOML Examples -->
+TOML test: {{ toml `
+title = "TOML Example"
+owner.name = "John Doe"
+` }}
+
+<!-- Conversion Examples -->
+String to Bool: {{ conv.Bool "true" }}
+String to Int: {{ conv.Int "987654321" }}
+String to Float: {{ conv.Float "1.234" }}
+To Base64: {{ base64.Encode "hello world" }}
+Join test: {{ join (`["foo", "bar", "baz"]` | jsonArray) "," }}
+
+<!-- File Function Example (assuming files exist in the template directory) -->
+Read file content: {{ file.Read "test/secret.txt" }}
+
+<!-- UUID Example -->
+Generate UUID: {{ uuid.V4 }}
+
+<!-- Context Examples -->
+Context test: {{ .user1.firstname }} {{ .user1.lastname }} {{ .user2.display_name }}

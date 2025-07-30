@@ -28,6 +28,15 @@ func (r *Config) Validate() error {
 	if len(r.InputFiles) != len(r.OutputFiles) {
 		return fmt.Errorf("input files and output files have different length")
 	}
+
+	if r.InputDir != "" && r.OutputDir == "" {
+		return fmt.Errorf("output directory is required when using the input directory")
+	}
+
+	if r.OutputDir != "" && r.InputDir == "" {
+		return fmt.Errorf("input directory is required when using the output directory")
+	}
+
 	return nil
 }
 

@@ -1,10 +1,11 @@
 package internal
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/SpaceCafe/miniplate/pkg"
 )
@@ -13,17 +14,17 @@ func createIOStreams(input string, output string) (reader io.ReadCloser, writer 
 	if input == "-" {
 		reader = os.Stdin
 	} else {
-		reader, err = os.Open(path.Clean(input))
+		reader, err = os.Open(filepath.Clean(input))
 	}
 
 	if output == "-" {
 		writer = os.Stdout
 	} else {
-		err = os.MkdirAll(path.Dir(output), 0750)
+		err = os.MkdirAll(filepath.Dir(output), 0750)
 		if err != nil {
 			return nil, nil, err
 		}
-		writer, err = os.Create(path.Clean(output))
+		writer, err = os.Create(filepath.Clean(output))
 	}
 
 	return
@@ -48,10 +49,38 @@ func Main() {
 		log.Fatal(err)
 	}
 
-	for i, input := range config.InputFiles {
-		err := renderTemplate(input, config.OutputFiles[i], ctx)
-		if err != nil {
-			log.Fatal(err)
+	if config.InputDir != "" {
+		err = filepath.WalkDir(config.InputDir, func(inputFile string, d os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if d.IsDir() {
+				return nil
+			}
+			for _, exclude := range config.Excludes {
+				if match, _ := filepath.Match(exclude, filepath.Base(inputFile)); match {
+					return nil
+				}
+			}
+
+			inputFileRelativePath, err := filepath.Rel(config.InputDir, inputFile)
+			if err != nil {
+				return fmt.Errorf("failed to get relative path: %v", err)
+			}
+
+			outputFile := filepath.Join(config.OutputDir, inputFileRelativePath)
+			return renderTemplate(inputFile, outputFile, ctx)
+		})
+	} else {
+		for i, input := range config.InputFiles {
+			err = renderTemplate(input, config.OutputFiles[i], ctx)
+			if err != nil {
+				break
+			}
 		}
+	}
+
+	if err != nil {
+		log.Fatal(err)
 	}
 }

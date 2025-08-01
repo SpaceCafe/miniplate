@@ -15,6 +15,9 @@ func createIOStreams(input string, output string) (reader io.ReadCloser, writer 
 		reader = os.Stdin
 	} else {
 		reader, err = os.Open(filepath.Clean(input))
+		if err != nil {
+			return nil, nil, fmt.Errorf("failed to open file '%s': %w", input, err)
+		}
 	}
 
 	if output == "-" {
@@ -22,7 +25,7 @@ func createIOStreams(input string, output string) (reader io.ReadCloser, writer 
 	} else {
 		err = os.MkdirAll(filepath.Dir(output), 0750)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("failed to create output directory '%s': %w", output, err)
 		}
 		writer, err = os.Create(filepath.Clean(output))
 	}
@@ -38,7 +41,11 @@ func renderTemplate(input string, output string, ctx map[string]any) (err error)
 	defer func() { _ = reader.Close() }()
 	defer func() { _ = writer.Close() }()
 
-	return pkg.RenderTemplate(reader, writer, ctx)
+	err = pkg.RenderTemplate(reader, writer, ctx)
+	if err != nil {
+		return fmt.Errorf("failed to render template '%s': %w", input, err)
+	}
+	return
 }
 
 func Main() {
@@ -65,7 +72,7 @@ func Main() {
 
 			inputFileRelativePath, err := filepath.Rel(config.InputDir, inputFile)
 			if err != nil {
-				return fmt.Errorf("failed to get relative path: %v", err)
+				return fmt.Errorf("failed to get relative path: %w", err)
 			}
 
 			outputFile := filepath.Join(config.OutputDir, inputFileRelativePath)

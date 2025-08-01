@@ -37,7 +37,7 @@ func LoadContexts(files []string) (ctx map[string]any, err error) {
 			data, err = dataFuncs.YAML(rawData)
 		}
 		if err != nil {
-			return
+			return nil, fmt.Errorf("failed to parse file %s: %w", filePath, err)
 		}
 		ctx[parts[0]] = data
 	}

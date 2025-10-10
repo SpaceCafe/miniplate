@@ -4,6 +4,7 @@ go 1.24.4
 
 require (
 	github.com/BurntSushi/toml v1.5.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/crypto v0.43.0

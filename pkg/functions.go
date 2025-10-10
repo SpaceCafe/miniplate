@@ -31,6 +31,7 @@ var FuncMap = template.FuncMap{
 	"env":    func() any { return &functions.EnvFuncs{} },
 	"getenv": functions.EnvFuncs{}.Getenv,
 
-	"file": func() any { return &functions.FileFuncs{} },
-	"uuid": func() any { return &functions.UUIDFuncs{} },
+	"file":  func() any { return &functions.FileFuncs{} },
+	"human": func() any { return &functions.HumanFuncs{} },
+	"uuid":  func() any { return &functions.UUIDFuncs{} },
 }

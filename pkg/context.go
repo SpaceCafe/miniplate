@@ -17,7 +17,7 @@ func LoadContexts(ctxList []string) (ctx map[string]any, err error) {
 	for _, ctxItem := range ctxList {
 		var (
 			ctxURL *url.URL
-			data   map[string]any
+			data   any
 		)
 
 		ctxName, ctxRawURL, ok := strings.Cut(ctxItem, "=")
@@ -48,7 +48,7 @@ func LoadContexts(ctxList []string) (ctx map[string]any, err error) {
 	return
 }
 
-func loadContextFromStdin(ctxURL *url.URL) (data map[string]any, err error) {
+func loadContextFromStdin(ctxURL *url.URL) (data any, err error) {
 	var (
 		buf []byte
 	)
@@ -61,7 +61,7 @@ func loadContextFromStdin(ctxURL *url.URL) (data map[string]any, err error) {
 	return parseContext(ctxURL, buf)
 }
 
-func loadContextFromFile(ctxURL *url.URL) (data map[string]any, err error) {
+func loadContextFromFile(ctxURL *url.URL) (data any, err error) {
 	var (
 		buf []byte
 	)
@@ -75,7 +75,7 @@ func loadContextFromFile(ctxURL *url.URL) (data map[string]any, err error) {
 	return parseContext(ctxURL, buf)
 }
 
-func loadContextFromWeb(ctxURL *url.URL) (data map[string]any, err error) {
+func loadContextFromWeb(ctxURL *url.URL) (data any, err error) {
 	var (
 		buf []byte
 	)
@@ -97,7 +97,7 @@ func loadContextFromWeb(ctxURL *url.URL) (data map[string]any, err error) {
 	return parseContext(ctxURL, buf)
 }
 
-func parseContext(ctxURL *url.URL, buf []byte) (data map[string]any, err error) {
+func parseContext(ctxURL *url.URL, buf []byte) (data any, err error) {
 	var (
 		dataFuncs = &functions.DataFuncs{}
 	)

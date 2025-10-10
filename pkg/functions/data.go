@@ -9,7 +9,7 @@ import (
 
 type DataFuncs struct{}
 
-func (DataFuncs) JSON(in any) (obj map[string]any, err error) {
+func (DataFuncs) JSON(in any) (obj any, err error) {
 	switch in := in.(type) {
 	case []byte:
 		err = json.Unmarshal(in, &obj)
@@ -29,7 +29,7 @@ func (DataFuncs) JSONArray(in any) (list []any, err error) {
 	return
 }
 
-func (DataFuncs) YAML(in any) (obj map[string]any, err error) {
+func (DataFuncs) YAML(in any) (obj any, err error) {
 	switch in := in.(type) {
 	case []byte:
 		err = yaml.Unmarshal(in, &obj)
@@ -49,7 +49,7 @@ func (DataFuncs) YAMLArray(in any) (list []any, err error) {
 	return
 }
 
-func (DataFuncs) TOML(in any) (obj map[string]any, err error) {
+func (DataFuncs) TOML(in any) (obj any, err error) {
 	switch in := in.(type) {
 	case []byte:
 		err = toml.Unmarshal(in, &obj)

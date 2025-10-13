@@ -67,7 +67,7 @@ func (ConvFuncs) Int(in any) (int64, error) {
 			return 0, fmt.Errorf("value out of range for int64: %d", v)
 		}
 		return int64(v), nil
-        case uint64:
+	case uint64:
 		if v > 1<<63-1 {
 			return 0, fmt.Errorf("value out of range for int64: %d", v)
 		}

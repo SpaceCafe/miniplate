@@ -12,7 +12,10 @@ var FuncMap = template.FuncMap{
 	"conv":     func() any { return &functions.ConvFuncs{} },
 	"bool":     functions.ConvFuncs{}.Bool,
 	"default":  functions.ConvFuncs{}.Default,
+	"float":    functions.ConvFuncs{}.Float,
+	"int":      functions.ConvFuncs{}.Int,
 	"join":     functions.ConvFuncs{}.Join,
+	"string":   functions.ConvFuncs{}.String,
 	"urlParse": functions.ConvFuncs{}.URL,
 
 	"crypto": func() any { return &functions.CryptoFuncs{} },
@@ -34,4 +37,13 @@ var FuncMap = template.FuncMap{
 	"file":  func() any { return &functions.FileFuncs{} },
 	"human": func() any { return &functions.HumanFuncs{} },
 	"uuid":  func() any { return &functions.UUIDFuncs{} },
+
+	"math": func() any { return &functions.MathFuncs{} },
+	"add":  functions.MathFuncs{}.Add,
+	"sub":  functions.MathFuncs{}.Sub,
+	"mul":  functions.MathFuncs{}.Mul,
+	"div":  functions.MathFuncs{}.Div,
+	"rem":  functions.MathFuncs{}.Rem,
+	"pow":  functions.MathFuncs{}.Pow,
+	"seq":  functions.MathFuncs{}.Seq,
 }

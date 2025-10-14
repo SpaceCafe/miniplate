@@ -230,14 +230,31 @@ func (r ConvFuncs) ToString(in any) string {
 func (r ConvFuncs) ToStrings(in ...any) (list []string) {
 	list = make([]string, len(in))
 	for i, v := range in {
-		list[i] = r.String(v)
+		list[i] = r.ToString(v)
 	}
 	return
 }
 
-func (r ConvFuncs) Join(in []any, sep string) string {
-	list := r.ToStrings(in...)
-	return strings.Join(list, sep)
+func (r ConvFuncs) Join(args ...any) string {
+	var (
+		v   []string
+		sep string
+		ok  bool
+	)
+	if len(args) < 2 {
+		return ""
+	}
+	if sep, ok = args[len(args)-1].(string); !ok {
+		return ""
+	}
+	for i := 0; i < len(args)-1; i++ {
+		if list, ok := args[i].([]any); ok {
+			v = append(v, r.ToStrings(list...)...)
+		} else {
+			v = append(v, r.ToString(args[i]))
+		}
+	}
+	return strings.Join(v, sep)
 }
 
 func (ConvFuncs) Default(def any, in any) any {

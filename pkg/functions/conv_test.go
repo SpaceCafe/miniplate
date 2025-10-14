@@ -289,18 +289,20 @@ func TestConvFuncs_ToString(t *testing.T) {
 func TestConvFuncs_Join(t *testing.T) {
 	tests := []struct {
 		name  string
-		sep   string
 		input []any
 		want  string
 	}{
-		{"no args", ",", []any{}, ""},
-		{"valid args", "|", []any{"3.14", 42}, "3.14|42"},
+		{"no args", []any{}, ""},
+		{"only separator", []any{","}, ""},
+		{"one value", []any{"foo", ","}, "foo"},
+		{"slice value", []any{[]any{"3.14", 42}, "|"}, "3.14|42"},
+		{"values", []any{"3.14", 42, "|"}, "3.14|42"},
 	}
 
 	c := ConvFuncs{}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := c.Join(tt.input, tt.sep)
+			got := c.Join(tt.input...)
 			assert.Equal(t, tt.want, got)
 		})
 	}

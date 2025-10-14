@@ -3,6 +3,7 @@ package functions
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type EnvFuncs struct{}
@@ -15,13 +16,14 @@ func (EnvFuncs) Getenv(key string, def ...string) (out string) {
 func (EnvFuncs) MustGetenv(key string, def ...string) (string, error) {
 	v, ok := os.LookupEnv(key)
 	if ok {
-		return v, nil
+		return strings.TrimSpace(v), nil
 	}
 
 	v, ok = os.LookupEnv(key + "_FILE")
 	if ok {
-		if (FileFuncs{}.IsFile(v)) {
-			return FileFuncs{}.Read(v)
+		if (FileFuncs{}.IsFile(strings.TrimSpace(v))) {
+			out, err := FileFuncs{}.Read(v)
+			return strings.TrimSpace(out), err
 		}
 		return "", fmt.Errorf("environment variable %s_FILE is not a file", key)
 	}

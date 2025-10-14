@@ -2,15 +2,10 @@ package functions
 
 import (
 	"crypto/md5" // #nosec CWE-327 -- Only used to create hashes of data
-	"errors"
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/sha3"
-)
-
-var (
-	ErrInvalidArgument = errors.New("invalid argument")
 )
 
 type CryptoFuncs struct{}

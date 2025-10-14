@@ -10,12 +10,12 @@ var FuncMap = template.FuncMap{
 	"base64": func() any { return &functions.Base64Funcs{} },
 
 	"conv":     func() any { return &functions.ConvFuncs{} },
-	"bool":     functions.ConvFuncs{}.Bool,
+	"bool":     functions.ConvFuncs{}.ToBool,
 	"default":  functions.ConvFuncs{}.Default,
-	"float":    functions.ConvFuncs{}.Float,
-	"int":      functions.ConvFuncs{}.Int,
+	"float":    functions.ConvFuncs{}.ToFloat64,
+	"int":      functions.ConvFuncs{}.ToInt64,
 	"join":     functions.ConvFuncs{}.Join,
-	"string":   functions.ConvFuncs{}.String,
+	"string":   functions.ConvFuncs{}.ToString,
 	"urlParse": functions.ConvFuncs{}.URL,
 
 	"crypto": func() any { return &functions.CryptoFuncs{} },
@@ -46,4 +46,14 @@ var FuncMap = template.FuncMap{
 	"rem":  functions.MathFuncs{}.Rem,
 	"pow":  functions.MathFuncs{}.Pow,
 	"seq":  functions.MathFuncs{}.Seq,
+
+	"strings":    func() any { return &functions.StringsFuncs{} },
+	"quote":      functions.StringsFuncs{}.Quote,
+	"replaceAll": functions.StringsFuncs{}.ReplaceAll,
+	"shellQuote": functions.StringsFuncs{}.ShellQuote,
+	"squote":     functions.StringsFuncs{}.Squote,
+	"title":      functions.StringsFuncs{}.Title,
+	"toLower":    functions.StringsFuncs{}.ToLower,
+	"toUpper":    functions.StringsFuncs{}.ToUpper,
+	"trimSpace":  functions.StringsFuncs{}.TrimSpace,
 }

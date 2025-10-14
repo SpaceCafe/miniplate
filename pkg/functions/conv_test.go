@@ -286,6 +286,27 @@ func TestConvFuncs_ToString(t *testing.T) {
 	}
 }
 
+func TestConvFuncs_ToStrings(t *testing.T) {
+	tests := []struct {
+		name  string
+		input any
+		want  []string
+	}{
+		{"one string", "hello", []string{"hello"}},
+		{"string slice", []string{"hello"}, []string{"hello"}},
+		{"string and int", []any{"hello", 42}, []string{"hello", "42"}},
+		{"int slice", []int{23, 42}, []string{"23", "42"}},
+	}
+
+	c := ConvFuncs{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := c.ToStrings(tt.input)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
 func TestConvFuncs_Join(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -306,6 +327,11 @@ func TestConvFuncs_Join(t *testing.T) {
 			assert.Equal(t, tt.want, got)
 		})
 	}
+
+	t.Run("string slice value", func(t *testing.T) {
+		got := c.Join([]string{"3.14", "16"}, "|")
+		assert.Equal(t, "3.14|16", got)
+	})
 }
 
 func TestConvFuncs_Default(t *testing.T) {

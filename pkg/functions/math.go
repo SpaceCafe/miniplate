@@ -6,23 +6,6 @@ import (
 	"slices"
 )
 
-type NumType int
-
-const (
-	NaN NumType = iota
-	Int
-	Float
-)
-
-const (
-	MaxSeqIterations = 100
-)
-
-var (
-	ErrDivZero    = fmt.Errorf("division by zero")
-	ErrTooFewArgs = fmt.Errorf("too few arguments")
-)
-
 type MathFuncs struct{}
 
 func (r MathFuncs) IsInt(in any) bool {
@@ -112,7 +95,7 @@ func (r MathFuncs) Mul(in ...any) (any, error) {
 
 func (r MathFuncs) Div(in ...any) (float64, error) {
 	if len(in) < 2 {
-		return 0, ErrTooFewArgs
+		return 0, ErrInvalidArgument
 	}
 	floats, err := ConvFuncs{}.ToFloat64s(in...)
 	if err != nil {
@@ -178,7 +161,7 @@ func (r MathFuncs) Seq(args ...any) (out []int64, err error) {
 	case 3:
 		start, end, step = v[0], v[1], v[2]
 	default:
-		return out, ErrTooFewArgs
+		return out, ErrInvalidArgument
 	}
 
 	if step == 0 {
@@ -246,7 +229,7 @@ func (r MathFuncs) mathOperation(
 	)
 
 	if len(in) == 0 {
-		return 0, ErrTooFewArgs
+		return 0, ErrInvalidArgument
 	}
 
 	if slices.ContainsFunc(in, r.IsFloat) {
@@ -257,7 +240,7 @@ func (r MathFuncs) mathOperation(
 		return floatOp(floats), nil
 	}
 
-	integers, err = ConvFuncs{}.ToInts(in...)
+	integers, err = ConvFuncs{}.ToInt64s(in...)
 	if err != nil {
 		return 0, err
 	}

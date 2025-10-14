@@ -9,11 +9,49 @@ import (
 	"strings"
 )
 
-var DecimalSymbols = []string{",", ".", "٫"}
-
 type ConvFuncs struct{}
 
-func (ConvFuncs) Bool(in any) (bool, error) {
+func (r ConvFuncs) Atoi(in any) (int64, error) {
+	return r.ToInt64(in)
+}
+
+func (r ConvFuncs) Bool(in any) (bool, error) {
+	return r.ToBool(in)
+}
+
+func (r ConvFuncs) Float(args ...any) (float64, error) {
+	return r.ToFloat64(args...)
+}
+
+func (r ConvFuncs) Int(in any) (int64, error) {
+	return r.ToInt64(in)
+}
+
+func (r ConvFuncs) ParseFloat(args ...any) (float64, error) {
+	return r.ToFloat64(args...)
+}
+
+func (r ConvFuncs) ParseInt(in any) (int64, error) {
+	return r.ToInt64(in)
+}
+
+func (r ConvFuncs) String(in any) string {
+	return r.ToString(in)
+}
+
+func (r ConvFuncs) ToFloat(args ...any) (float64, error) {
+	return r.ToFloat64(args...)
+}
+
+func (r ConvFuncs) ToInt(in any) (int64, error) {
+	return r.ToInt64(in)
+}
+
+func (r ConvFuncs) ToInts(in ...any) ([]int64, error) {
+	return r.ToInt64s(in...)
+}
+
+func (ConvFuncs) ToBool(in any) (bool, error) {
 	switch v := in.(type) {
 	case bool:
 		return v, nil
@@ -29,14 +67,10 @@ func (ConvFuncs) Bool(in any) (bool, error) {
 	return false, fmt.Errorf("invalid boolean value: %v", in)
 }
 
-func (r ConvFuncs) ToBool(in any) (bool, error) {
-	return r.Bool(in)
-}
-
 func (r ConvFuncs) ToBools(in ...any) (list []bool, err error) {
 	list = make([]bool, len(in))
 	for i, v := range in {
-		list[i], err = r.Bool(v)
+		list[i], err = r.ToBool(v)
 		if err != nil {
 			return
 		}
@@ -44,7 +78,7 @@ func (r ConvFuncs) ToBools(in ...any) (list []bool, err error) {
 	return
 }
 
-func (ConvFuncs) Int(in any) (int64, error) {
+func (ConvFuncs) ToInt64(in any) (int64, error) {
 	switch v := in.(type) {
 	case int:
 		return int64(v), nil
@@ -84,26 +118,10 @@ func (ConvFuncs) Int(in any) (int64, error) {
 	return 0, fmt.Errorf("invalid integer value: %v", in)
 }
 
-func (r ConvFuncs) ParseInt(in any) (int64, error) {
-	return r.Int(in)
-}
-
-func (r ConvFuncs) Atoi(in any) (int64, error) {
-	return r.Int(in)
-}
-
-func (r ConvFuncs) ToInt(in any) (int64, error) {
-	return r.Int(in)
-}
-
-func (r ConvFuncs) ToInt64(in any) (int64, error) {
-	return r.Int(in)
-}
-
-func (r ConvFuncs) ToInts(in ...any) (list []int64, err error) {
+func (r ConvFuncs) ToInt64s(in ...any) (list []int64, err error) {
 	list = make([]int64, len(in))
 	for i, v := range in {
-		list[i], err = r.Int(v)
+		list[i], err = r.ToInt64(v)
 		if err != nil {
 			return
 		}
@@ -111,11 +129,7 @@ func (r ConvFuncs) ToInts(in ...any) (list []int64, err error) {
 	return
 }
 
-func (r ConvFuncs) ToInt64s(in ...any) ([]int64, error) {
-	return r.ToInts(in...)
-}
-
-func (ConvFuncs) Float(args ...any) (float64, error) {
+func (ConvFuncs) ToFloat64(args ...any) (float64, error) {
 	var (
 		in  any
 		sep = "."
@@ -168,14 +182,6 @@ func (ConvFuncs) Float(args ...any) (float64, error) {
 	return 0, fmt.Errorf("invalid float value: %v", args[0])
 }
 
-func (r ConvFuncs) ParseFloat(in any) (float64, error) {
-	return r.Float(in)
-}
-
-func (r ConvFuncs) ToFloat64(args ...any) (float64, error) {
-	return r.Float(args...)
-}
-
 func (r ConvFuncs) ToFloat64s(args ...any) (list []float64, err error) {
 	if len(args) > 1 {
 		if sep, ok := decimalSymbol(args[0]); ok {
@@ -199,7 +205,7 @@ func (r ConvFuncs) ToFloat64s(args ...any) (list []float64, err error) {
 	return
 }
 
-func (ConvFuncs) String(in any) string {
+func (ConvFuncs) ToString(in any) string {
 	if in == nil {
 		return ""
 	}
@@ -223,14 +229,19 @@ func (ConvFuncs) String(in any) string {
 	}
 }
 
-func (r ConvFuncs) ToString(in any) string {
-	return r.String(in)
-}
-
 func (r ConvFuncs) ToStrings(in ...any) (list []string) {
-	list = make([]string, len(in))
-	for i, v := range in {
-		list[i] = r.ToString(v)
+	list = make([]string, 0)
+	for i := range in {
+		val := reflect.ValueOf(in[i])
+		switch val.Kind() {
+		case reflect.Slice, reflect.Array:
+			for j := range val.Len() {
+				list = append(list, r.ToString(val.Index(j).Interface()))
+			}
+		default:
+			list = append(list, r.ToString(in[i]))
+
+		}
 	}
 	return
 }
@@ -247,13 +258,7 @@ func (r ConvFuncs) Join(args ...any) string {
 	if sep, ok = args[len(args)-1].(string); !ok {
 		return ""
 	}
-	for i := 0; i < len(args)-1; i++ {
-		if list, ok := args[i].([]any); ok {
-			v = append(v, r.ToStrings(list...)...)
-		} else {
-			v = append(v, r.ToString(args[i]))
-		}
-	}
+	v = append(v, r.ToStrings(args[:len(args)-1]...)...)
 	return strings.Join(v, sep)
 }
 

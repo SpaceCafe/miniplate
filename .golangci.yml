@@ -1,0 +1,103 @@
+---
+version: "2"
+linters:
+  default: all
+  disable:
+    - dupl
+    - exhaustive
+    - exhaustruct
+    - gochecknoglobals
+    - ireturn
+    - mnd
+    - nonamedreturns
+    - varnamelen
+    - wrapcheck
+    - wsl
+  settings:
+    cyclop:
+      max-complexity: 20
+    depguard:
+      rules:
+        main:
+          list-mode: strict
+          files:
+            - $all
+            - '!$test'
+          allow:
+            - $gostd
+            - github.com/goccy/go-yaml
+            - golang.org/x/crypto
+            - github.com/BurntSushi/toml
+            - github.com/dustin/go-humanize
+            - github.com/spacecafe/miniplate
+            - github.com/gosimple/slug
+            - golang.org/x/text
+            - golang.org/x/text
+            - github.com/google/uuid
+        tests:
+          list-mode: strict
+          files:
+            - $test
+          allow:
+            - $gostd
+            - github.com/spacecafe/miniplate
+            - github.com/stretchr/testify
+    funcorder:
+      constructor: true
+      struct-method: true
+      alphabetical: true
+    gocritic:
+      enable-all: true
+    gocyclo:
+      min-complexity: 20
+    govet:
+      enable-all: true
+    tagliatelle:
+      case:
+        extended-rules:
+          json:
+            case: goCamel
+          yaml:
+            case: goCamel
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - funlen
+        path: _test.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines
+    - swaggo
+  settings:
+    gofmt:
+      rewrite-rules:
+        - pattern: interface{}
+          replacement: any
+        - pattern: a[b:len(a)]
+          replacement: a[b:]
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+run:
+  allow-parallel-runners: true
+  relative-path-mode: gomod
+  build-tags:
+    - with_yaml
+...

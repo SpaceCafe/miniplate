@@ -1,10 +1,11 @@
-package pkg
+package pkg_test
 
 import (
 	"fmt"
 	"reflect"
 	"testing"
 
+	"github.com/spacecafe/miniplate/pkg"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,7 +43,7 @@ func TestLoadContexts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadContexts(tt.input)
+			got, err := pkg.LoadContexts(tt.input)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {

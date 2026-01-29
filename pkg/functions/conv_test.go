@@ -1,60 +1,68 @@
-package functions
+package functions_test
 
 import (
 	"testing"
 
+	"github.com/spacecafe/miniplate/pkg/functions"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConvFuncs_ToBool(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
-		name    string
 		input   any
+		name    string
 		want    bool
 		wantErr bool
 	}{
 		// Basic type conversions
-		{"bool true", true, true, false},
-		{"bool false", false, false, false},
+		{name: "bool true", input: true, want: true, wantErr: false},
+		{name: "bool false", input: false, want: false, wantErr: false},
 
-		{"int positive", 42, true, false},
-		{"int zero", 0, false, false},
-		{"int negative", -1, true, false},
+		{name: "int positive", input: 42, want: true, wantErr: false},
+		{name: "int zero", input: 0, want: false, wantErr: false},
+		{name: "int negative", input: -1, want: true, wantErr: false},
 
-		{"float64 positive", 3.14, true, false},
-		{"float64 zero", float64(0), false, false},
-		{"float64 negative", -2.718, true, false},
+		{name: "float64 positive", input: 3.14, want: true, wantErr: false},
+		{name: "float64 zero", input: float64(0), want: false, wantErr: false},
+		{name: "float64 negative", input: -2.718, want: true, wantErr: false},
 
 		// String conversions
-		{"string 1", "1", true, false},
-		{"string t", "t", true, false},
-		{"string y", "y", true, false},
-		{"string true", "true", true, false},
-		{"string yes", "yes", true, false},
-		{"string on", "on", true, false},
-		{"string 0", "0", false, false},
-		{"string f", "f", false, false},
-		{"string n", "n", false, false},
-		{"string false", "false", false, false},
-		{"string no", "no", false, false},
-		{"string off", "off", false, false},
-		{"string invalid", "invalid", false, true},
+		{name: "string 1", input: "1", want: true, wantErr: false},
+		{name: "string t", input: "t", want: true, wantErr: false},
+		{name: "string y", input: "y", want: true, wantErr: false},
+		{name: "string true", input: "true", want: true, wantErr: false},
+		{name: "string yes", input: "yes", want: true, wantErr: false},
+		{name: "string on", input: "on", want: true, wantErr: false},
+		{name: "string 0", input: "0", want: false, wantErr: false},
+		{name: "string f", input: "f", want: false, wantErr: false},
+		{name: "string n", input: "n", want: false, wantErr: false},
+		{name: "string false", input: "false", want: false, wantErr: false},
+		{name: "string no", input: "no", want: false, wantErr: false},
+		{name: "string off", input: "off", want: false, wantErr: false},
+		{name: "string invalid", input: "invalid", want: false, wantErr: true},
 
 		// Empty string case
-		{"empty string", "", false, true},
+		{name: "empty string", input: "", want: false, wantErr: true},
 
 		// Invalid types
-		{"nil input", nil, false, true},
+		{name: "nil input", input: nil, want: false, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToBool(tt.input)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.want, got)
 			}
 		})
@@ -62,25 +70,31 @@ func TestConvFuncs_ToBool(t *testing.T) {
 }
 
 func TestConvFuncs_ToBools(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   []any
 		want    []bool
 		wantErr bool
 	}{
-		{"no args", []any{}, []bool{}, false},
-		{"valid args", []any{"t", "off"}, []bool{true, false}, false},
-		{"invalid args", []any{"t", "off", "invalid"}, nil, true},
+		{name: "no args", input: []any{}, want: []bool{}},
+		{name: "valid args", input: []any{"t", "off"}, want: []bool{true, false}},
+		{name: "invalid args", input: []any{"t", "off", "invalid"}, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToBools(tt.input...)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.want, got)
 			}
 		})
@@ -88,59 +102,75 @@ func TestConvFuncs_ToBools(t *testing.T) {
 }
 
 func TestConvFuncs_ToInt64(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
-		name    string
 		input   any
+		name    string
 		want    int64
 		wantErr bool
 	}{
 		// Basic type conversions
-		{"int zero", 0, 0, false},
-		{"int positive", 42, 42, false},
-		{"int negative", -17, -17, false},
-		{"uint positive", uint(99), 99, false},
-		{"int8 positive", int8(32), 32, false},
-		{"int8 negative", int8(-45), -45, false},
-		{"int16 positive", int16(1_000), 1_000, false},
-		{"int16 negative", int16(-3_000), -3_000, false},
-		{"int32 positive", int32(500_000), 500_000, false},
-		{"int32 negative", int32(-900_000), -900_000, false},
-		{"int64 positive", int64(1_000_000_000), 1_000_000_000, false},
-		{"int64 negative", int64(-2_000_000_000), -2_000_000_000, false},
-		{"uint8 positive", uint8(23), 23, false},
-		{"uint16 positive", uint16(5_000), 5_000, false},
-		{"uint32 positive", uint32(700_000), 700_000, false},
-		{"uint32 max", uint32(4_294_967_295), 4_294_967_295, false},
-		{"uint64 positive", uint64(10_000_000_000), 10_000_000_000, false},
-		{"uint64 max", uint64(18_446_744_073_709_551_615), 0, true},
+		{name: "int zero", input: 0, want: 0, wantErr: false},
+		{name: "int positive", input: 42, want: 42, wantErr: false},
+		{name: "int negative", input: -17, want: -17, wantErr: false},
+		{name: "uint positive", input: uint(99), want: 99, wantErr: false},
+		{name: "int8 positive", input: int8(32), want: 32, wantErr: false},
+		{name: "int8 negative", input: int8(-45), want: -45, wantErr: false},
+		{name: "int16 positive", input: int16(1_000), want: 1_000, wantErr: false},
+		{name: "int16 negative", input: int16(-3_000), want: -3_000, wantErr: false},
+		{name: "int32 positive", input: int32(500_000), want: 500_000, wantErr: false},
+		{name: "int32 negative", input: int32(-900_000), want: -900_000, wantErr: false},
+		{name: "int64 positive", input: int64(1_000_000_000), want: 1_000_000_000, wantErr: false},
+		{
+			name:    "int64 negative",
+			input:   int64(-2_000_000_000),
+			want:    -2_000_000_000,
+			wantErr: false,
+		},
+		{name: "uint8 positive", input: uint8(23), want: 23, wantErr: false},
+		{name: "uint16 positive", input: uint16(5_000), want: 5_000, wantErr: false},
+		{name: "uint32 positive", input: uint32(700_000), want: 700_000, wantErr: false},
+		{name: "uint32 max", input: uint32(4_294_967_295), want: 4_294_967_295, wantErr: false},
+		{
+			name:    "uint64 positive",
+			input:   uint64(10_000_000_000),
+			want:    10_000_000_000,
+			wantErr: false,
+		},
+		{name: "uint64 max", input: uint64(18_446_744_073_709_551_615), want: 0, wantErr: true},
 
 		// Float conversions
-		{"float32 positive", float32(3.14), 3, false},
-		{"float32 negative", float32(-2.718), -2, false},
-		{"float64 positive", 9.5, 9, false},
-		{"float64 negative", -8.3, -8, false},
+		{name: "float32 positive", input: float32(3.14), want: 3, wantErr: false},
+		{name: "float32 negative", input: float32(-2.718), want: -2, wantErr: false},
+		{name: "float64 positive", input: 9.5, want: 9, wantErr: false},
+		{name: "float64 negative", input: -8.3, want: -8, wantErr: false},
 
 		// String conversions
-		{"string zero", "0", 0, false},
-		{"string positive", "123", 123, false},
-		{"string negative", "-975", -975, false},
-		{"string invalid", "invalid", 0, true},
+		{name: "string zero", input: "0", want: 0, wantErr: false},
+		{name: "string positive", input: "123", want: 123, wantErr: false},
+		{name: "string negative", input: "-975", want: -975, wantErr: false},
+		{name: "string invalid", input: "invalid", want: 0, wantErr: true},
 
 		// Empty string case
-		{"empty string", "", 0, true},
+		{name: "empty string", input: "", want: 0, wantErr: true},
 
 		// Invalid types
-		{"nil input", nil, 0, true},
+		{name: "nil input", input: nil, want: 0, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToInt64(tt.input)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.want, got)
 			}
 		})
@@ -148,25 +178,31 @@ func TestConvFuncs_ToInt64(t *testing.T) {
 }
 
 func TestConvFuncs_ToInt64s(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   []any
 		want    []int64
 		wantErr bool
 	}{
-		{"no args", []any{}, []int64{}, false},
-		{"valid args", []any{"23", 42.0}, []int64{23, 42}, false},
-		{"invalid args", []any{"23", 42.0, "invalid"}, nil, true},
+		{name: "no args", input: []any{}, want: []int64{}},
+		{name: "valid args", input: []any{"23", 42.0}, want: []int64{23, 42}},
+		{name: "invalid args", input: []any{"23", 42.0, "invalid"}, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToInt64s(tt.input...)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, tt.want, got)
 			}
 		})
@@ -174,6 +210,8 @@ func TestConvFuncs_ToInt64s(t *testing.T) {
 }
 
 func TestConvFuncs_ToFloat64(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   []any
@@ -181,43 +219,47 @@ func TestConvFuncs_ToFloat64(t *testing.T) {
 		wantErr bool
 	}{
 		// Basic type conversions
-		{"float32 positive", []any{float32(3.14)}, 3.14, false},
-		{"float32 negative", []any{float32(-2.718)}, -2.718, false},
-		{"float64 positive", []any{9.5}, 9.5, false},
-		{"float64 zero", []any{0.0}, 0.0, false},
-		{"float64 negative", []any{-8.3}, -8.3, false},
+		{name: "float32 positive", input: []any{float32(3.14)}, want: 3.14, wantErr: false},
+		{name: "float32 negative", input: []any{float32(-2.718)}, want: -2.718, wantErr: false},
+		{name: "float64 positive", input: []any{9.5}, want: 9.5, wantErr: false},
+		{name: "float64 zero", input: []any{0.0}, want: 0.0, wantErr: false},
+		{name: "float64 negative", input: []any{-8.3}, want: -8.3, wantErr: false},
 
 		// Integer conversions
-		{"int positive", []any{42}, 42.0, false},
-		{"int zero", []any{0}, 0.0, false},
-		{"int negative", []any{-17}, -17.0, false},
-		{"uint positive", []any{uint(99)}, 99.0, false},
+		{name: "int positive", input: []any{42}, want: 42.0, wantErr: false},
+		{name: "int zero", input: []any{0}, want: 0.0, wantErr: false},
+		{name: "int negative", input: []any{-17}, want: -17.0, wantErr: false},
+		{name: "uint positive", input: []any{uint(99)}, want: 99.0, wantErr: false},
 
 		// String conversions
-		{"string decimal", []any{"3.14"}, 3.14, false},
-		{"string integer", []any{"42"}, 42.0, false},
-		{"string negative", []any{"-2.718"}, -2.718, false},
-		{"string separator", []any{",", "-2,718"}, -2.718, false},
-		{"string invalid", []any{"invalid"}, 0.0, true},
-		{"string invalid args", []any{"3,14", 23}, 0.0, true},
-		{"no args", []any{}, 0.0, true},
-		{"too many args", []any{"", "", ""}, 0.0, true},
+		{name: "string decimal", input: []any{"3.14"}, want: 3.14, wantErr: false},
+		{name: "string integer", input: []any{"42"}, want: 42.0, wantErr: false},
+		{name: "string negative", input: []any{"-2.718"}, want: -2.718, wantErr: false},
+		{name: "string separator", input: []any{",", "-2,718"}, want: -2.718, wantErr: false},
+		{name: "string invalid", input: []any{"invalid"}, want: 0.0, wantErr: true},
+		{name: "string invalid args", input: []any{"3,14", 23}, want: 0.0, wantErr: true},
+		{name: "no args", input: []any{}, want: 0.0, wantErr: true},
+		{name: "too many args", input: []any{"", "", ""}, want: 0.0, wantErr: true},
 
 		// Empty string case
-		{"empty string", []any{""}, 0.0, true},
+		{name: "empty string", input: []any{""}, want: 0.0, wantErr: true},
 
 		// Invalid types
-		{"nil input", []any{nil}, 0.0, true},
+		{name: "nil input", input: []any{nil}, want: 0.0, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToFloat64(tt.input...)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.InDelta(t, tt.want, got, 0.000_001)
 			}
 		})
@@ -225,26 +267,32 @@ func TestConvFuncs_ToFloat64(t *testing.T) {
 }
 
 func TestConvFuncs_ToFloat64s(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name    string
 		input   []any
 		want    []float64
 		wantErr bool
 	}{
-		{"no args", []any{}, []float64{}, false},
-		{"valid args", []any{"3.14", 42}, []float64{3.14, 42.0}, false},
-		{"valid separator", []any{",", "3,14", 42}, []float64{3.14, 42.0}, false},
-		{"invalid args", []any{"3.14", 42, "invalid"}, nil, true},
+		{name: "no args", input: []any{}, want: []float64{}},
+		{name: "valid args", input: []any{"3.14", 42}, want: []float64{3.14, 42.0}},
+		{name: "valid separator", input: []any{",", "3,14", 42}, want: []float64{3.14, 42.0}},
+		{name: "invalid args", input: []any{"3.14", 42, "invalid"}, wantErr: true},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := c.ToFloat64s(tt.input...)
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
+				t.Log(err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.InDeltaSlice(t, tt.want, got, 0.000_001)
 			}
 		})
@@ -252,34 +300,39 @@ func TestConvFuncs_ToFloat64s(t *testing.T) {
 }
 
 func TestConvFuncs_ToString(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
 		input any
 		want  string
 	}{
 		// Basic type conversions
-		{"string", "hello", "hello"},
-		{"int", 42, "42"},
-		{"float32", float32(3.14), "3.14"},
-		{"float64", 9.5, "9.5"},
-		{"bool true", true, "true"},
-		{"bool false", false, "false"},
+		{name: "string", input: "hello", want: "hello"},
+		{name: "int", input: 42, want: "42"},
+		{name: "float32", input: float32(3.14), want: "3.14"},
+		{name: "float64", input: 9.5, want: "9.5"},
+		{name: "bool true", input: true, want: "true"},
+		{name: "bool false", input: false, want: "false"},
 
 		// Slices
-		{"slice of strings", []string{"a", "b"}, "[a b]"},
-		{"empty slice", []string{}, "[]"},
+		{name: "slice of strings", input: []string{"a", "b"}, want: "[a b]"},
+		{name: "empty slice", input: []string{}, want: "[]"},
 
 		// Maps
-		{"map with values", map[string]int{"key": 42}, "map[key:42]"},
-		{"empty map", map[string]int{}, "map[]"},
+		{name: "map with values", input: map[string]int{"key": 42}, want: "map[key:42]"},
+		{name: "empty map", input: map[string]int{}, want: "map[]"},
 
 		// Other types
-		{"nil input", nil, ""},
+		{name: "nil input", input: nil, want: ""},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := c.ToString(tt.input)
 			assert.Equal(t, tt.want, got)
 		})
@@ -287,20 +340,25 @@ func TestConvFuncs_ToString(t *testing.T) {
 }
 
 func TestConvFuncs_ToStrings(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
 		input any
 		want  []string
 	}{
-		{"one string", "hello", []string{"hello"}},
-		{"string slice", []string{"hello"}, []string{"hello"}},
-		{"string and int", []any{"hello", 42}, []string{"hello", "42"}},
-		{"int slice", []int{23, 42}, []string{"23", "42"}},
+		{name: "one string", input: "hello", want: []string{"hello"}},
+		{name: "string slice", input: []string{"hello"}, want: []string{"hello"}},
+		{name: "string and int", input: []any{"hello", 42}, want: []string{"hello", "42"}},
+		{name: "int slice", input: []int{23, 42}, want: []string{"23", "42"}},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := c.ToStrings(tt.input)
 			assert.Equal(t, tt.want, got)
 		})
@@ -308,54 +366,81 @@ func TestConvFuncs_ToStrings(t *testing.T) {
 }
 
 func TestConvFuncs_Join(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
-		input []any
 		want  string
+		input []any
 	}{
-		{"no args", []any{}, ""},
-		{"only separator", []any{","}, ""},
-		{"one value", []any{"foo", ","}, "foo"},
-		{"slice value", []any{[]any{"3.14", 42}, "|"}, "3.14|42"},
-		{"values", []any{"3.14", 42, "|"}, "3.14|42"},
+		{name: "no args", input: []any{}, want: ""},
+		{name: "only separator", input: []any{","}, want: ""},
+		{name: "one value", input: []any{"foo", ","}, want: "foo"},
+		{name: "slice value", input: []any{[]any{"3.14", 42}, "|"}, want: "3.14|42"},
+		{name: "values", input: []any{"3.14", 42, "|"}, want: "3.14|42"},
 	}
 
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := c.Join(tt.input...)
 			assert.Equal(t, tt.want, got)
 		})
 	}
 
 	t.Run("string slice value", func(t *testing.T) {
+		t.Parallel()
+
 		got := c.Join([]string{"3.14", "16"}, "|")
 		assert.Equal(t, "3.14|16", got)
 	})
 }
 
 func TestConvFuncs_Default(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
-		name  string
 		def   any
 		input any
 		want  any
+		name  string
 	}{
-		{"bool false", true, false, true},
-		{"bool true", false, true, true},
-		{"int zero", 42, 0, 42},
-		{"int", 42, 23, 23},
-		{"empty string", "default", "", "default"},
-		{"string", "default", "test", "test"},
-		{"empty slice", []string{"default"}, []string{}, []string{"default"}},
-		{"slice", []string{"default"}, []string{"test"}, []string{"test"}},
-		{"empty map", map[string]int{"default": 42}, map[string]int{}, map[string]int{"default": 42}},
-		{"map", map[string]int{"default": 42}, map[string]int{"test": 23}, map[string]int{"test": 23}},
-		{"nil", "default", nil, "default"},
+		{name: "bool false", def: true, input: false, want: true},
+		{name: "bool true", def: false, input: true, want: true},
+		{name: "int zero", def: 42, input: 0, want: 42},
+		{name: "int", def: 42, input: 23, want: 23},
+		{name: "empty string", def: "default", input: "", want: "default"},
+		{name: "string", def: "default", input: "test", want: "test"},
+		{
+			name:  "empty slice",
+			def:   []string{"default"},
+			input: []string{},
+			want:  []string{"default"},
+		},
+		{name: "slice", def: []string{"default"}, input: []string{"test"}, want: []string{"test"}},
+		{
+			name:  "empty map",
+			def:   map[string]int{"default": 42},
+			input: map[string]int{},
+			want:  map[string]int{"default": 42},
+		},
+		{
+			name:  "map",
+			def:   map[string]int{"default": 42},
+			input: map[string]int{"test": 23},
+			want:  map[string]int{"test": 23},
+		},
+		{name: "nil", def: "default", input: nil, want: "default"},
 	}
-	c := ConvFuncs{}
+	c := functions.ConvFuncs{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			got := c.Default(tt.def, tt.input)
 			assert.Equal(t, tt.want, got)
 		})

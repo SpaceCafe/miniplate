@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/SpaceCafe/miniplate/pkg"
+	"github.com/spacecafe/miniplate/pkg"
 )
 
 func createIOStreams(input string, output string) (reader io.ReadCloser, writer io.WriteCloser, err error) {

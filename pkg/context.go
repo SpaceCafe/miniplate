@@ -9,7 +9,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/SpaceCafe/miniplate/pkg/functions"
+	"github.com/spacecafe/miniplate/pkg/functions"
 )
 
 func LoadContexts(ctxList []string) (ctx map[string]any, err error) {

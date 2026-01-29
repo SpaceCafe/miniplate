@@ -10,11 +10,12 @@ import (
 
 type CryptoFuncs struct{}
 
-func (CryptoFuncs) Bcrypt(args ...any) (string, error) {
+func (f CryptoFuncs) Bcrypt(args ...any) (string, error) {
 	var (
 		in   string
 		cost = 10
 	)
+
 	if len(args) == 0 || len(args) > 2 {
 		return "", ErrInvalidArgument
 	}
@@ -35,48 +36,49 @@ func (CryptoFuncs) Bcrypt(args ...any) (string, error) {
 	}
 
 	result, err := bcrypt.GenerateFromPassword([]byte(in), cost)
+
 	return string(result), err
 }
 
-func (r CryptoFuncs) SHA224(in any) string {
-	return fmt.Sprintf("%x", r.SHA224Bytes(in))
+func (f CryptoFuncs) MD5(in any) string {
+	return fmt.Sprintf("%x", f.MD5Bytes(in))
 }
 
-func (r CryptoFuncs) SHA256(in any) string {
-	return fmt.Sprintf("%x", r.SHA256Bytes(in))
+func (CryptoFuncs) MD5Bytes(in any) [16]byte {
+	// #nosec CWE-328 -- Only used to create hashes of data
+	return md5.Sum(ParseBytes(in))
 }
 
-func (r CryptoFuncs) SHA384(in any) string {
-	return fmt.Sprintf("%x", r.SHA384Bytes(in))
-}
-
-func (r CryptoFuncs) SHA512(in any) string {
-	return fmt.Sprintf("%x", r.SHA512Bytes(in))
-}
-
-func (r CryptoFuncs) MD5(in any) string {
-	return fmt.Sprintf("%x", r.MD5Bytes(in))
+func (f CryptoFuncs) SHA224(in any) string {
+	return fmt.Sprintf("%x", f.SHA224Bytes(in))
 }
 
 func (CryptoFuncs) SHA224Bytes(in any) [28]byte {
 	return sha3.Sum224(ParseBytes(in))
 }
 
+func (f CryptoFuncs) SHA256(in any) string {
+	return fmt.Sprintf("%x", f.SHA256Bytes(in))
+}
+
 func (CryptoFuncs) SHA256Bytes(in any) [32]byte {
 	return sha3.Sum256(ParseBytes(in))
+}
+
+func (f CryptoFuncs) SHA384(in any) string {
+	return fmt.Sprintf("%x", f.SHA384Bytes(in))
 }
 
 func (CryptoFuncs) SHA384Bytes(in any) [48]byte {
 	return sha3.Sum384(ParseBytes(in))
 }
 
-func (CryptoFuncs) SHA512Bytes(in any) [64]byte {
-	return sha3.Sum512(ParseBytes(in))
+func (f CryptoFuncs) SHA512(in any) string {
+	return fmt.Sprintf("%x", f.SHA512Bytes(in))
 }
 
-func (CryptoFuncs) MD5Bytes(in any) [16]byte {
-	// #nosec CWE-328 -- Only used to create hashes of data
-	return md5.Sum(ParseBytes(in))
+func (CryptoFuncs) SHA512Bytes(in any) [64]byte {
+	return sha3.Sum512(ParseBytes(in))
 }
 
 func ParseBytes(in any) []byte {

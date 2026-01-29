@@ -3,7 +3,7 @@ package pkg
 import (
 	"text/template"
 
-	"github.com/SpaceCafe/miniplate/pkg/functions"
+	"github.com/spacecafe/miniplate/pkg/functions"
 )
 
 var FuncMap = template.FuncMap{

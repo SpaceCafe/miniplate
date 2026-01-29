@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/SpaceCafe/miniplate/internal"
+	"github.com/spacecafe/miniplate/internal"
 )
 
 func main() {

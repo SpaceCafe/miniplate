@@ -10,6 +10,7 @@ type EnvFuncs struct{}
 
 func (EnvFuncs) Getenv(key string, def ...string) (out string) {
 	out, _ = EnvFuncs{}.MustGetenv(key, def...)
+
 	return
 }
 
@@ -23,14 +24,20 @@ func (EnvFuncs) MustGetenv(key string, def ...string) (string, error) {
 	if ok {
 		if (FileFuncs{}.IsFile(strings.TrimSpace(v))) {
 			out, err := FileFuncs{}.Read(v)
+
 			return strings.TrimSpace(out), err
 		}
-		return "", fmt.Errorf("environment variable %s_FILE is not a file", key)
+
+		return "", fmt.Errorf(
+			"%w: environment variable %s_FILE is not a file",
+			ErrInvalidArgument,
+			key,
+		)
 	}
 
 	if len(def) > 0 {
 		return def[0], nil
-	} else {
-		return "", fmt.Errorf("environment variable %s not set", key)
 	}
+
+	return "", fmt.Errorf("%w: environment variable %s not set", ErrInvalidArgument, key)
 }

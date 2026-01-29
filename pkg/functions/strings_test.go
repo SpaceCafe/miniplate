@@ -1,12 +1,15 @@
-package functions
+package functions_test
 
 import (
 	"testing"
 
+	"github.com/spacecafe/miniplate/pkg/functions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStringsFuncs_ShellQuote(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
 		input any
@@ -20,13 +23,17 @@ func TestStringsFuncs_ShellQuote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := StringsFuncs{}.ShellQuote(tt.input)
+			t.Parallel()
+
+			got := functions.StringsFuncs{}.ShellQuote(tt.input)
 			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
 func TestStringsFuncs_Squote(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name  string
 		input any
@@ -38,7 +45,9 @@ func TestStringsFuncs_Squote(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := StringsFuncs{}.Squote(tt.input)
+			t.Parallel()
+
+			got := functions.StringsFuncs{}.Squote(tt.input)
 			assert.Equal(t, tt.want, got)
 		})
 	}

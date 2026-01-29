@@ -1,8 +1,6 @@
 package functions
 
-import (
-	"fmt"
-)
+import "errors"
 
 type NumType int
 
@@ -18,6 +16,7 @@ const (
 
 var (
 	DecimalSymbols     = []string{",", ".", "٫"}
-	ErrDivZero         = fmt.Errorf("division by zero")
-	ErrInvalidArgument = fmt.Errorf("invalid argument")
+	ErrDivZero         = errors.New("division by zero")
+	ErrInvalidArgument = errors.New("invalid argument")
+	ErrUnsupportedType = errors.New("unsupported type")
 )

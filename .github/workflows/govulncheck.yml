@@ -1,4 +1,5 @@
-name: govulncheck
+---
+name: "Go Vulnerability"
 
 on:
   push:
@@ -8,11 +9,9 @@ on:
 
 jobs:
   govulncheck:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-    - uses: actions/checkout@v5
-
-    - name: Run govulncheck
-      uses: golang/govulncheck-action@v1
-      with:
-        go-package: ./...
+      - uses: "golang/govulncheck-action@v1"
+        with:
+          go-package: "./..."
+...

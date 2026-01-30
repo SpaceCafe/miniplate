@@ -1,4 +1,5 @@
-name: go-test
+---
+name: "Go Test"
 
 on:
   push:
@@ -8,14 +9,14 @@ on:
 
 jobs:
   go-test:
-    runs-on: ubuntu-latest
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v5
+      - uses: "actions/checkout@v6"
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - uses: "actions/setup-go@v6"
         with:
-          go-version: stable
+          go-version: "stable"
 
-      - name: Test
-        run: go test -v ./...
+      - name: "Test"
+        run: "go test -v ./..."
+...

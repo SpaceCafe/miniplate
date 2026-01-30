@@ -15,8 +15,9 @@ const (
 )
 
 var (
-	DecimalSymbols     = []string{",", ".", "٫"}
-	ErrDivZero         = errors.New("division by zero")
-	ErrInvalidArgument = errors.New("invalid argument")
-	ErrUnsupportedType = errors.New("unsupported type")
+	DecimalSymbols       = []string{",", ".", "٫"}
+	ErrDivZero           = errors.New("division by zero")
+	ErrInvalidArgument   = errors.New("invalid argument")
+	ErrUnsupportedType   = errors.New("unsupported type")
+	ErrUndefinedTemplate = errors.New("undefined template")
 )

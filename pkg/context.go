@@ -1,6 +1,8 @@
 package pkg
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,8 +14,11 @@ import (
 	"github.com/spacecafe/miniplate/pkg/functions"
 )
 
+var ErrInvalidContext = errors.New("invalid context")
+
 func LoadContexts(ctxList []string) (ctx map[string]any, err error) {
 	ctx = make(map[string]any)
+
 	for _, ctxItem := range ctxList {
 		var (
 			ctxURL *url.URL
@@ -22,7 +27,7 @@ func LoadContexts(ctxList []string) (ctx map[string]any, err error) {
 
 		ctxName, ctxRawURL, ok := strings.Cut(ctxItem, "=")
 		if !ok || (ctxName == "" && ctxRawURL == "") {
-			return ctx, fmt.Errorf("unsupported context format: %s", ctxItem)
+			return ctx, fmt.Errorf("%w: unsupported context format: %s", ErrInvalidContext, ctxItem)
 		}
 
 		ctxURL, err = url.Parse(ctxRawURL)
@@ -38,20 +43,25 @@ func LoadContexts(ctxList []string) (ctx map[string]any, err error) {
 		case "http", "https":
 			data, err = loadContextFromWeb(ctxURL)
 		default:
-			return nil, fmt.Errorf("unsupported context schema: %s", ctxURL.Scheme)
+			return nil, fmt.Errorf(
+				"%w: unsupported context schema: %s",
+				ErrInvalidContext,
+				ctxURL.Scheme,
+			)
 		}
+
 		if err != nil {
 			return nil, err
 		}
+
 		ctx[ctxName] = data
 	}
-	return
+
+	return ctx, err
 }
 
 func loadContextFromStdin(ctxURL *url.URL) (data any, err error) {
-	var (
-		buf []byte
-	)
+	var buf []byte
 
 	buf, err = io.ReadAll(os.Stdin)
 	if err != nil {
@@ -62,11 +72,10 @@ func loadContextFromStdin(ctxURL *url.URL) (data any, err error) {
 }
 
 func loadContextFromFile(ctxURL *url.URL) (data any, err error) {
-	var (
-		buf []byte
-	)
+	var buf []byte
 
 	filePath := path.Clean(ctxURL.Host + ctxURL.Path)
+
 	buf, err = os.ReadFile(path.Clean(filePath))
 	if err != nil {
 		return
@@ -76,34 +85,49 @@ func loadContextFromFile(ctxURL *url.URL) (data any, err error) {
 }
 
 func loadContextFromWeb(ctxURL *url.URL) (data any, err error) {
-	var (
-		buf []byte
-	)
+	var buf []byte
 
-	resp, err := http.Get(ctxURL.String())
+	req, err := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet,
+		ctxURL.String(),
+		http.NoBody,
+	)
 	if err != nil {
-		return
+		return data, err
 	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return data, err
+	}
+
 	defer func() { _ = resp.Body.Close() }()
+
 	buf, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return
+		return data, err
 	}
+
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to load context at %s: %s", ctxURL.String(), resp.Status)
+		return nil, fmt.Errorf(
+			"%w: failed to load context at %s: %s",
+			ErrInvalidContext,
+			ctxURL.String(),
+			resp.Status,
+		)
 	}
+
 	ctxURL.RawQuery = "type=" + resp.Header.Get("Content-Type")
 
 	return parseContext(ctxURL, buf)
 }
 
 func parseContext(ctxURL *url.URL, buf []byte) (data any, err error) {
-	var (
-		dataFuncs = &functions.DataFuncs{}
-	)
+	dataFuncs := &functions.DataFuncs{}
 
 	if len(buf) == 0 {
-		return nil, fmt.Errorf("empty context at %s", ctxURL.String())
+		return nil, fmt.Errorf("%w: empty context at %s", ErrInvalidContext, ctxURL.String())
 	}
 
 	switch path.Ext(ctxURL.Path) {
@@ -127,11 +151,23 @@ func parseContext(ctxURL *url.URL, buf []byte) (data any, err error) {
 		case "application/yaml", "text/plain":
 			data, err = dataFuncs.YAML(buf)
 		default:
-			return nil, fmt.Errorf("unsupported context mime type at %s: %s", ctxURL.String(), mime)
+			return nil, fmt.Errorf(
+				"%w: unsupported context mime type at %s: %s",
+				ErrInvalidContext,
+				ctxURL.String(),
+				mime,
+			)
 		}
 	}
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse context at %s: %w", ctxURL.String(), err)
+		return nil, fmt.Errorf(
+			"%w: failed to parse context at %s: %w",
+			ErrInvalidContext,
+			ctxURL.String(),
+			err,
+		)
 	}
-	return
+
+	return data, err
 }

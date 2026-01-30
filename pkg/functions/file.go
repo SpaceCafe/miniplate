@@ -2,7 +2,7 @@ package functions
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type FileFuncs struct{}
@@ -26,13 +26,13 @@ func (FileFuncs) IsFile(inputPath string) bool {
 }
 
 func (FileFuncs) Read(inputPath string) (string, error) {
-	bytes, err := os.ReadFile(path.Clean(inputPath))
+	bytes, err := os.ReadFile(filepath.Clean(inputPath))
 
 	return string(bytes), err
 }
 
 func (FileFuncs) ReadDir(inputPath string) ([]string, error) {
-	entries, err := os.ReadDir(path.Clean(inputPath))
+	entries, err := os.ReadDir(filepath.Clean(inputPath))
 	if err != nil {
 		return nil, err
 	}
@@ -47,4 +47,8 @@ func (FileFuncs) ReadDir(inputPath string) ([]string, error) {
 
 func (FileFuncs) Stat(inputPath string) (os.FileInfo, error) {
 	return os.Stat(inputPath)
+}
+
+func (FileFuncs) Write(outputPath string, data any) error {
+	return os.WriteFile(filepath.Clean(outputPath), []byte(ConversionFuncs{}.ToString(data)), 0o600)
 }

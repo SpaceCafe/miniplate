@@ -10,6 +10,7 @@ build/miniplate:
 test:
 	go test ./... -v -race
 	SECRET_FILE=test/secret.txt ./build/miniplate --in test/example.tmpl --context user1=test/testdata.json --context user2=test/testdata.yaml
+	./build/miniplate --in test/nested.tmpl
 
 clean:
 	@rm -rf "build"

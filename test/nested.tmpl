@@ -1,0 +1,9 @@
+{{ define "mytemplate" }}
+Herein lies the {{ .region }} configuration...
+{{ end -}}
+
+{{- range $region := slice "AT" "DE" "FR" -}}
+{{- $ctx := dict "region" $region }}
+{{- $outPath := printf "config_%s.txt" $region }}
+{{- tmpl.Exec "mytemplate" $ctx | file.Write $outPath }}
+{{- end -}}

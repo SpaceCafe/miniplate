@@ -10,7 +10,7 @@ type MathFuncs struct{}
 
 func (f MathFuncs) Abs(in any) (any, error) {
 	if f.IsFloat(in) {
-		v, err := ConvFuncs{}.ToFloat64(in)
+		v, err := ConversionFuncs{}.ToFloat64(in)
 		if err != nil {
 			return 0, err
 		}
@@ -18,7 +18,7 @@ func (f MathFuncs) Abs(in any) (any, error) {
 		return math.Abs(v), nil
 	}
 
-	v, err := ConvFuncs{}.ToInt64(in)
+	v, err := ConversionFuncs{}.ToInt64(in)
 	if err != nil {
 		return 0, err
 	}
@@ -35,7 +35,7 @@ func (f MathFuncs) Add(in ...any) (any, error) {
 }
 
 func (f MathFuncs) Ceil(in any) (float64, error) {
-	v, err := ConvFuncs{}.ToFloat64(in)
+	v, err := ConversionFuncs{}.ToFloat64(in)
 	if err != nil {
 		return 0, err
 	}
@@ -48,7 +48,7 @@ func (f MathFuncs) Div(in ...any) (float64, error) {
 		return 0, ErrInvalidArgument
 	}
 
-	floats, err := ConvFuncs{}.ToFloat64s(in...)
+	floats, err := ConversionFuncs{}.ToFloat64s(in...)
 	if err != nil {
 		return 0, err
 	}
@@ -66,7 +66,7 @@ func (f MathFuncs) Div(in ...any) (float64, error) {
 }
 
 func (f MathFuncs) Floor(in any) (float64, error) {
-	v, err := ConvFuncs{}.ToFloat64(in)
+	v, err := ConversionFuncs{}.ToFloat64(in)
 	if err != nil {
 		return 0, err
 	}
@@ -99,12 +99,12 @@ func (f MathFuncs) Mul(in ...any) (any, error) {
 }
 
 func (f MathFuncs) Pow(base, exponent any) (float64, error) {
-	x, err := ConvFuncs{}.ToFloat64(base)
+	x, err := ConversionFuncs{}.ToFloat64(base)
 	if err != nil {
 		return 0, err
 	}
 
-	y, err := ConvFuncs{}.ToFloat64(exponent)
+	y, err := ConversionFuncs{}.ToFloat64(exponent)
 	if err != nil {
 		return 0, err
 	}
@@ -117,12 +117,12 @@ func (f MathFuncs) Rem(divisor, dividend any) (any, error) {
 		return 0, fmt.Errorf("%w: invalid type: %T, %T", ErrInvalidArgument, divisor, dividend)
 	}
 
-	x, err := ConvFuncs{}.ToInt64(divisor)
+	x, err := ConversionFuncs{}.ToInt64(divisor)
 	if err != nil {
 		return 0, err
 	}
 
-	y, err := ConvFuncs{}.ToInt64(dividend)
+	y, err := ConversionFuncs{}.ToInt64(dividend)
 	if err != nil {
 		return 0, err
 	}
@@ -135,7 +135,7 @@ func (f MathFuncs) Rem(divisor, dividend any) (any, error) {
 }
 
 func (f MathFuncs) Round(in any) (float64, error) {
-	v, err := ConvFuncs{}.ToFloat64(in)
+	v, err := ConversionFuncs{}.ToFloat64(in)
 	if err != nil {
 		return 0, err
 	}
@@ -151,7 +151,7 @@ func (f MathFuncs) Seq(args ...any) (out []int64, err error) {
 
 	out = []int64{}
 
-	v, err := ConvFuncs{}.ToInt64s(args...)
+	v, err := ConversionFuncs{}.ToInt64s(args...)
 	if err != nil {
 		return
 	}
@@ -219,7 +219,7 @@ func (f MathFuncs) mathOperation(
 	}
 
 	if slices.ContainsFunc(in, f.IsFloat) {
-		floats, err = ConvFuncs{}.ToFloat64s(in...)
+		floats, err = ConversionFuncs{}.ToFloat64s(in...)
 		if err != nil {
 			return 0, err
 		}
@@ -227,7 +227,7 @@ func (f MathFuncs) mathOperation(
 		return floatOp(floats), nil
 	}
 
-	integers, err = ConvFuncs{}.ToInt64s(in...)
+	integers, err = ConversionFuncs{}.ToInt64s(in...)
 	if err != nil {
 		return 0, err
 	}

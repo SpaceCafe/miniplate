@@ -7,7 +7,7 @@ import (
 type HumanFuncs struct{}
 
 func (f HumanFuncs) Bytes(in any) (string, error) {
-	v, err := ConvFuncs{}.ToInt64(in)
+	v, err := ConversionFuncs{}.ToInt64(in)
 	if err != nil {
 		return "", err
 	}
@@ -20,14 +20,14 @@ func (f HumanFuncs) Bytes(in any) (string, error) {
 }
 
 func (HumanFuncs) ParseBytes(in any) (int64, error) {
-	v := ConvFuncs{}.ToString(in)
+	v := ConversionFuncs{}.ToString(in)
 
 	result, err := humanize.ParseBytes(v)
 	if err != nil {
 		return 0, err
 	}
 
-	return ConvFuncs{}.ToInt64(result)
+	return ConversionFuncs{}.ToInt64(result)
 }
 
 func (f HumanFuncs) ToBytes(in any) (string, error) {

@@ -51,7 +51,7 @@ func TestConvFuncs_ToBool(t *testing.T) {
 		{name: "nil input", input: nil, want: false, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -83,7 +83,7 @@ func TestConvFuncs_ToBools(t *testing.T) {
 		{name: "invalid args", input: []any{"t", "off", "invalid"}, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -159,7 +159,7 @@ func TestConvFuncs_ToInt64(t *testing.T) {
 		{name: "nil input", input: nil, want: 0, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -191,7 +191,7 @@ func TestConvFuncs_ToInt64s(t *testing.T) {
 		{name: "invalid args", input: []any{"23", 42.0, "invalid"}, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -248,7 +248,7 @@ func TestConvFuncs_ToFloat64(t *testing.T) {
 		{name: "nil input", input: []any{nil}, want: 0.0, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -281,7 +281,7 @@ func TestConvFuncs_ToFloat64s(t *testing.T) {
 		{name: "invalid args", input: []any{"3.14", 42, "invalid"}, wantErr: true},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -327,7 +327,7 @@ func TestConvFuncs_ToString(t *testing.T) {
 		{name: "nil input", input: nil, want: ""},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -353,7 +353,7 @@ func TestConvFuncs_ToStrings(t *testing.T) {
 		{name: "int slice", input: []int{23, 42}, want: []string{"23", "42"}},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -380,7 +380,7 @@ func TestConvFuncs_Join(t *testing.T) {
 		{name: "values", input: []any{"3.14", 42, "|"}, want: "3.14|42"},
 	}
 
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -435,7 +435,7 @@ func TestConvFuncs_Default(t *testing.T) {
 		},
 		{name: "nil", def: "default", input: nil, want: "default"},
 	}
-	c := functions.ConvFuncs{}
+	c := functions.ConversionFuncs{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

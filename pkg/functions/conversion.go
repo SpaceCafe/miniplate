@@ -9,17 +9,21 @@ import (
 	"strings"
 )
 
-type ConvFuncs struct{}
+type Byteable interface {
+	Bytes() []byte
+}
 
-func (f ConvFuncs) Atoi(in any) (int64, error) {
+type ConversionFuncs struct{}
+
+func (f ConversionFuncs) Atoi(in any) (int64, error) {
 	return f.ToInt64(in)
 }
 
-func (f ConvFuncs) Bool(in any) (bool, error) {
+func (f ConversionFuncs) Bool(in any) (bool, error) {
 	return f.ToBool(in)
 }
 
-func (f ConvFuncs) Default(def, in any) any {
+func (f ConversionFuncs) Default(def, in any) any {
 	if in == nil {
 		return def
 	}
@@ -39,15 +43,15 @@ func (f ConvFuncs) Default(def, in any) any {
 	return in
 }
 
-func (f ConvFuncs) Float(args ...any) (float64, error) {
+func (f ConversionFuncs) Float(args ...any) (float64, error) {
 	return f.ToFloat64(args...)
 }
 
-func (f ConvFuncs) Int(in any) (int64, error) {
+func (f ConversionFuncs) Int(in any) (int64, error) {
 	return f.ToInt64(in)
 }
 
-func (f ConvFuncs) Join(args ...any) string {
+func (f ConversionFuncs) Join(args ...any) string {
 	var (
 		sep string
 		ok  bool
@@ -76,19 +80,19 @@ func (f ConvFuncs) Join(args ...any) string {
 	return builder.String()
 }
 
-func (f ConvFuncs) ParseFloat(args ...any) (float64, error) {
+func (f ConversionFuncs) ParseFloat(args ...any) (float64, error) {
 	return f.ToFloat64(args...)
 }
 
-func (f ConvFuncs) ParseInt(in any) (int64, error) {
+func (f ConversionFuncs) ParseInt(in any) (int64, error) {
 	return f.ToInt64(in)
 }
 
-func (f ConvFuncs) String(in any) string {
+func (f ConversionFuncs) String(in any) string {
 	return f.ToString(in)
 }
 
-func (f ConvFuncs) ToBool(in any) (bool, error) {
+func (f ConversionFuncs) ToBool(in any) (bool, error) {
 	switch v := in.(type) {
 	case bool:
 		return v, nil
@@ -105,7 +109,7 @@ func (f ConvFuncs) ToBool(in any) (bool, error) {
 	return false, fmt.Errorf("%w: not a boolean value: %v", ErrInvalidArgument, in)
 }
 
-func (f ConvFuncs) ToBools(in ...any) (list []bool, err error) {
+func (f ConversionFuncs) ToBools(in ...any) (list []bool, err error) {
 	list = make([]bool, len(in))
 	for i, v := range in {
 		list[i], err = f.ToBool(v)
@@ -117,11 +121,11 @@ func (f ConvFuncs) ToBools(in ...any) (list []bool, err error) {
 	return
 }
 
-func (f ConvFuncs) ToFloat(args ...any) (float64, error) {
+func (f ConversionFuncs) ToFloat(args ...any) (float64, error) {
 	return f.ToFloat64(args...)
 }
 
-func (f ConvFuncs) ToFloat64(args ...any) (float64, error) {
+func (f ConversionFuncs) ToFloat64(args ...any) (float64, error) {
 	var (
 		in  any
 		sep = "."
@@ -176,7 +180,7 @@ func (f ConvFuncs) ToFloat64(args ...any) (float64, error) {
 	return 0, fmt.Errorf("%w: not a float value: %v", ErrInvalidArgument, args[0])
 }
 
-func (f ConvFuncs) ToFloat64s(args ...any) (list []float64, err error) {
+func (f ConversionFuncs) ToFloat64s(args ...any) (list []float64, err error) {
 	if len(args) > 1 {
 		if sep, ok := decimalSymbol(args[0]); ok {
 			list = make([]float64, len(args[1:]))
@@ -202,11 +206,11 @@ func (f ConvFuncs) ToFloat64s(args ...any) (list []float64, err error) {
 	return
 }
 
-func (f ConvFuncs) ToInt(in any) (int64, error) {
+func (f ConversionFuncs) ToInt(in any) (int64, error) {
 	return f.ToInt64(in)
 }
 
-func (f ConvFuncs) ToInt64(in any) (int64, error) {
+func (f ConversionFuncs) ToInt64(in any) (int64, error) {
 	switch v := in.(type) {
 	case int:
 		return int64(v), nil
@@ -249,7 +253,7 @@ func (f ConvFuncs) ToInt64(in any) (int64, error) {
 	return 0, fmt.Errorf("%w: invalid integer value: %v", ErrInvalidArgument, in)
 }
 
-func (f ConvFuncs) ToInt64s(in ...any) (list []int64, err error) {
+func (f ConversionFuncs) ToInt64s(in ...any) (list []int64, err error) {
 	list = make([]int64, len(in))
 	for i, v := range in {
 		list[i], err = f.ToInt64(v)
@@ -261,11 +265,11 @@ func (f ConvFuncs) ToInt64s(in ...any) (list []int64, err error) {
 	return
 }
 
-func (f ConvFuncs) ToInts(in ...any) ([]int64, error) {
+func (f ConversionFuncs) ToInts(in ...any) ([]int64, error) {
 	return f.ToInt64s(in...)
 }
 
-func (f ConvFuncs) ToString(in any) string {
+func (f ConversionFuncs) ToString(in any) string {
 	if in == nil {
 		return ""
 	}
@@ -285,12 +289,14 @@ func (f ConvFuncs) ToString(in any) string {
 		return v
 	case fmt.Stringer:
 		return v.String()
+	case Byteable:
+		return string(v.Bytes())
 	default:
 		return fmt.Sprintf("%v", v)
 	}
 }
 
-func (f ConvFuncs) ToStrings(in ...any) (list []string) {
+func (f ConversionFuncs) ToStrings(in ...any) (list []string) {
 	list = make([]string, 0)
 
 	for _, v := range in {
@@ -308,7 +314,7 @@ func (f ConvFuncs) ToStrings(in ...any) (list []string) {
 	return
 }
 
-func (f ConvFuncs) URL(in string) (*url.URL, error) {
+func (f ConversionFuncs) URL(in string) (*url.URL, error) {
 	return url.Parse(in)
 }
 

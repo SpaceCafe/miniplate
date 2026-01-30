@@ -1,5 +1,8 @@
 ---
 name: "Go Security"
+permissions:
+  contents: "read"
+  security-events: "write"
 
 on:
   push:

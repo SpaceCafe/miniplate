@@ -2,8 +2,7 @@ package functions
 
 import (
 	"encoding/json"
-
-	"github.com/goccy/go-yaml"
+	"encoding/xml"
 )
 
 type DataFuncs struct{}
@@ -40,4 +39,27 @@ func (DataFuncs) ToJSONPretty(indent string, obj any) (string, error) {
 	result, err := json.MarshalIndent(obj, "", indent)
 
 	return string(result), err
+}
+
+func (DataFuncs) ToXML(obj any) (string, error) {
+	result, err := xml.Marshal(obj)
+
+	return string(result), err
+}
+
+func (DataFuncs) ToXMLPretty(indent string, obj any) (string, error) {
+	result, err := xml.MarshalIndent(obj, "", indent)
+
+	return string(result), err
+}
+
+func (DataFuncs) XML(in any) (obj any, err error) {
+	switch in := in.(type) {
+	case []byte:
+		err = xml.Unmarshal(in, &obj)
+	case string:
+		err = xml.Unmarshal([]byte(in), &obj)
+	}
+
+	return
 }

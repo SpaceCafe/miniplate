@@ -138,6 +138,7 @@ func (f ConversionFuncs) ToFloat64(args ...any) (float64, error) {
 
 	if len(args) == 2 {
 		if sep, ok = decimalSymbol(args[0]); ok {
+			// #nosec -- we already checked the length of args
 			in = args[1]
 		} else {
 			return 0.0, ErrInvalidArgument

@@ -16,8 +16,10 @@ const (
 
 var (
 	DecimalSymbols       = []string{",", ".", "٫"}
+	ErrBuiltWithoutTOML  = errors.New("built without TOML support")
+	ErrBuiltWithoutYAML  = errors.New("built without YAML support")
 	ErrDivZero           = errors.New("division by zero")
 	ErrInvalidArgument   = errors.New("invalid argument")
-	ErrUnsupportedType   = errors.New("unsupported type")
 	ErrUndefinedTemplate = errors.New("undefined template")
+	ErrUnsupportedType   = errors.New("unsupported type")
 )

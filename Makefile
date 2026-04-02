@@ -4,7 +4,7 @@
 all: build/miniplate test
 
 build/miniplate:
-	go build -a -buildmode=exe -trimpath -ldflags="-s -w" -o build/ ./cmd/miniplate/
+	go build -a -buildmode=exe -trimpath -ldflags="-s -w" -tags=toml,yaml -o build/ ./cmd/miniplate/
 	upx --best build/miniplate
 
 test:

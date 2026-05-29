@@ -81,6 +81,9 @@ func loadContextFromFile(ctxURL *url.URL) (data any, err error) {
 		return
 	}
 
+	ctxURL.Path = filePath
+	ctxURL.Host = ""
+
 	return parseContext(ctxURL, buf)
 }
 

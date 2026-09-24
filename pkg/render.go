@@ -26,11 +26,10 @@ func (r *Renderer) Render(input, output string, ctx map[string]any) error {
 	r.init(input, output, ctx)
 
 	reader, writer, cleanup, err := r.createIOStreams()
-	defer cleanup()
-
 	if err != nil {
 		return err
 	}
+	defer cleanup()
 
 	var buf []byte
 
@@ -68,11 +67,15 @@ func (r *Renderer) createIOStreams() (io.ReadCloser, io.WriteCloser, func(), err
 	} else {
 		err = os.MkdirAll(filepath.Dir(r.output), 0o750)
 		if err != nil {
+			_ = reader.Close()
+
 			return nil, nil, nil, fmt.Errorf("%w: %s: %w", ErrCreateDir, r.output, err)
 		}
 
 		writer, err = os.Create(filepath.Clean(r.output))
 		if err != nil {
+			_ = reader.Close()
+
 			return nil, nil, nil, fmt.Errorf("%w: %s: %w", ErrOpenFile, r.output, err)
 		}
 	}

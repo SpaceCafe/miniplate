@@ -22,8 +22,6 @@ func Main() {
 			err = (&pkg.Renderer{}).Render(input, config.OutputFiles[i], ctx)
 			if err != nil {
 				log.Fatal(err)
-
-				return
 			}
 		}
 
